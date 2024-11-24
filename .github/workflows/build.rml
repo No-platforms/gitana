@@ -1,0 +1,76 @@
+name: Build and Publish Gitana
+
+on:
+  push:
+    branches:
+      - main  # Change this to your default branch if it's different
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.21'  # Specify the Go version you want to use
+
+      - name: Build for Linux
+        run: |
+          mkdir -p dist
+          GOOS=linux GOARCH=amd64 go build -o dist/gitana ./...
+          GOOS=linux GOARCH=arm64 go build -o dist/gitana_arm64 ./...
+
+      - name: Create Debian Package
+        run: |
+          sudo apt-get install -y dh-make devscripts
+          cd dist
+          mkdir gitana-1.0
+          cp gitana gitana-1.0/
+          cd gitana-1.0
+          mkdir DEBIAN
+          echo "Package: gitana" >> DEBIAN/control
+          echo "Version: 1.0" >> DEBIAN/control
+          echo "Section: utils" >> DEBIAN/control
+          echo "Priority: optional" >> DEBIAN/control
+          echo "Architecture: amd64" >> DEBIAN/control
+          echo "Depends: " >> DEBIAN/control
+          echo "Maintainer: YiiMan <info@yiiman.ir>" >> DEBIAN/control
+          echo "Description: Gitana CLI tool" >> DEBIAN/control
+          dpkg-deb --build gitana-1.0
+
+      - name: Create RPM Package (for yum)
+        run: |
+          sudo yum install -y rpm-build 
+          mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          cp dist/gitana ~/rpmbuild/SOURCES/
+          echo "Name: gitana" >> ~/rpmbuild/SPECS/gitana.spec
+          echo "Version: 1.0" >> ~/rpmbuild/SPECS/gitana.spec
+          echo "Release: 1%{?dist}" >> ~/rpmbuild/SPECS/gitana.spec
+          echo "Summary: Gitana CLI tool" >> ~/rpmbuild/SPECS/gitana.spec
+          echo "%description" >> ~/rpmbuild/SPECS/gitana.spec
+          echo "Gitana CLI tool" >> ~/rpmbuild/SPECS/gitana.spec
+          echo "%files" >> ~/rpmbuild/SPECS/gitana.spec
+          echo "/usr/local/bin/gitana" >> ~/rpmbuild/SPECS/gitana.spec
+          rpmbuild -ba ~/rpmbuild/SPECS/gitana.spec
+
+      - name: Create Alpine Package (for apk)
+        run: |
+          mkdir -p dist/alpine/usr/local/bin/
+          cp dist/gitana dist/alpine/usr/local/bin/
+          cd dist/alpine
+          echo "gitana" > APKBUILD
+          echo "# Maintainer:" >> APKBUILD
+          echo "pkgname=gitana" >> APKBUILD
+          echo "pkgver=1.0" >> APKBUILD
+          echo "pkgrel=0" >> APKBUILD
+          echo "arch=\"x86_64 arm64\"" >> APKBUILD
+          echo "license=\"MIT\"" >> APKBUILD
+          echo "source=\"\"" >> APKBUILD
+          
+      # More steps can be added here to publish or upload packages as needed.
