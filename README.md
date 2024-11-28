@@ -2,7 +2,7 @@
 
 # Gitana CLI
 
-Gitana CLI is a powerful command-line tool designed for generating Dockerized Git analytics and exporting results as PNG images. This tool provides various statistics from Git repositories, making it easier for developers to analyze their code contributions and project history.
+Gitana CLI is a powerful command-line tool designed for generating Git analytics. This tool provides various statistics from Git repositories, making it easier for developers to analyze their code contributions and project history.
 
 ## Features
 
