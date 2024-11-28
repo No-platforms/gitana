@@ -50,7 +50,7 @@ gitana [command] [subcommand]
 - **Git Commands**:
   - `git first_commit`: Get information about the first commit.
   - `git contributors`: List all contributors.
-  - `git branch_count`: Count all branches created and merged.
+  - `git merged_branches_count`: Count all branches created and merged.
   - `git branches`: List all merge commits in the repository.
   - `git branches_count`: Count all merge commits.
   - `git commit_count`: Count total commits in the repository.
@@ -73,7 +73,7 @@ gitana [command] [subcommand]
 
 3. Count all branches:
    ```bash
-   ./gitana git branch_count
+   ./gitana git merged_branches_count
    ```
 
 4. List all merge commits:

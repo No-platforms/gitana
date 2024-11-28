@@ -3,7 +3,7 @@ name: Build and Publish Gitana
 on:
   push:
     branches:
-      - main  # Change this to your default branch if it's different
+      - main 
   release:
     types: [created]
 

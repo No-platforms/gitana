@@ -1,3 +1,5 @@
+github.com/No-platforms/go-jdf v0.0.0-20241124224008-d1891cef653c h1:iYA85ZDh4cZXpqLk/faY0xdiX4OZ+hpSaRV8blm4d5Y=
+github.com/No-platforms/go-jdf v0.0.0-20241124224008-d1891cef653c/go.mod h1:yFLRp0Y7zwuADi1iaRDyTyQamsVKjeskydHZ4lS1Bdc=
 github.com/cpuguy83/go-md2man/v2 v2.0.5 h1:ZtcqGrnekaHpVLArFSe4HK5DoKx1T0rq2DwVB0alcyc=
 github.com/cpuguy83/go-md2man/v2 v2.0.5/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/jalaali/go-jalaali v0.0.0-20210801064154-80525e88d958 h1:qxLoi6CAcXVzjfvu+KXIXJOAsQB62LXjsfbOaErsVzE=
