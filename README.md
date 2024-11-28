@@ -8,7 +8,7 @@ Gitana CLI is a powerful command-line tool designed for generating Dockerized Gi
 
 - **First Commit Info**: Retrieve the date and author of the first commit in the repository.
 - **Contributors List**: List all contributors to the repository along with their commit counts.
-- **Branch Management**: Count and list branches, including merged branches.
+- **Branch count**: Count and list branches, including merged branches.
 - **Commit Count**: Get the total number of commits in the repository.
 - **Line Count**: Count lines of code in the repository.
 - **Docker Integration**: Generate Docker commands for GitHub repository analytics.
@@ -39,6 +39,12 @@ To install Gitana CLI, follow these steps:
    ```bash
    mv gitana /usr/local/bin/
    ```
+5. (Optional) Config permission:
+   ```bash
+   sudo chmod +x /usr/local/bin/gitana
+   ```
+   
+
 Another way to build and install easily:
 ```bash
     make
@@ -70,45 +76,44 @@ gitana [command] [subcommand]
 
 1. Get information about the first commit:
    ```bash
-   ./gitana git first_commit
+   gitana git first_commit
    ```
 
 2. List all contributors:
    ```bash
-   ./gitana git contributors
+   gitana git contributors
    ```
 
 3. Count all branches:
    ```bash
-   ./gitana git merged_branches_count
+   gitana git merged_branches_count
    ```
 
 4. List all merge commits:
    ```bash
-   ./gitana git branches
+   gitana git branches
    ```
 
 5. Count total commits:
    ```bash
-   ./gitana git commit_count
+   gitana git commit_count
    ```
 
 6. Generate Git Stats based on https://github.com/src-d/hercules package for specific repository
 
 Important Considerations:
-* First argument is git repository
-* Second argument is a port number for bind to report web server
+* First argument is git repository URL
 * Report generation time depends on repository size
 * Process may take several minutes for large repositories
 * Requires pulling the Hercules Docker image before analysis
 * Command Syntax:
    ```bash
-   ./gitana stat https://github.com/user/repo.git
+   gitana stat https://github.com/user/repo.git
    ```
 
 7. Count lines of code in the repository:
    ```bash
-   ./gitana lines
+   gitana lines
    ```
 
 ## Contribution

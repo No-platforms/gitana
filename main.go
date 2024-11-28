@@ -195,12 +195,8 @@ func runStat(c *cli.Context) error {
 	if c.NArg() < 1 {
 		return fmt.Errorf("please provide a GitHub repository URL")
 	}
-	if c.NArg() < 2 {
-		return fmt.Errorf("please provide a port to bind web based report")
-	}
 
 	repoURL := c.Args().Get(0)
-	Port := c.Args().Get(1)
 	//Don't change Order of below arguments
 	modes := []string{
 		"burndown-project",
@@ -213,7 +209,7 @@ func runStat(c *cli.Context) error {
 		"sentiment",
 	}
 	modStr := strings.Join(modes, " -m ")
-	dockerCommand := fmt.Sprintf(`docker run --rm srcd/hercules hercules --burndown --burndown-files --devs --couples --burndown-people  --pb %s | docker run -p "%s:8000" --rm -i -v "$(pwd):/io" srcd/hercules labours -f pb --background=white -m %s --disable-projector -o /io/%s.png`, repoURL, Port, modStr, extractRepoName(repoURL))
+	dockerCommand := fmt.Sprintf(`docker run --rm srcd/hercules hercules --burndown --burndown-files --devs --couples --burndown-people  --pb %s | docker run --rm -i -v "$(pwd):/io" srcd/hercules labours -f pb --background=white -m %s --disable-projector -o /io/%s.png`, repoURL, modStr, extractRepoName(repoURL))
 
 	fmt.Println("Running command:", dockerCommand)
 
