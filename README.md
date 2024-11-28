@@ -12,7 +12,10 @@ Gitana CLI is a powerful command-line tool designed for generating Dockerized Gi
 - **Commit Count**: Get the total number of commits in the repository.
 - **Line Count**: Count lines of code in the repository.
 - **Docker Integration**: Generate Docker commands for GitHub repository analytics.
+## Prerequisites
+  Docker installed on your system
 
+  Git repository URL
 ## Installation
 
 To install Gitana CLI, follow these steps:
@@ -36,6 +39,10 @@ To install Gitana CLI, follow these steps:
    ```bash
    mv gitana /usr/local/bin/
    ```
+Another way to build and install easily:
+```bash
+    make
+```
 
 ## Usage
 
@@ -86,7 +93,15 @@ gitana [command] [subcommand]
    ./gitana git commit_count
    ```
 
-6. Generate Docker commands for a specific repository:
+6. Generate Git Stats based on https://github.com/src-d/hercules package for specific repository
+
+Important Considerations:
+* First argument is git repository
+* Second argument is a port number for bind to report web server
+* Report generation time depends on repository size
+* Process may take several minutes for large repositories
+* Requires pulling the Hercules Docker image before analysis
+* Command Syntax:
    ```bash
    ./gitana stat https://github.com/user/repo.git
    ```
@@ -108,12 +123,13 @@ Contributions are welcome! If you would like to contribute to Gitana CLI, please
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
 - Thanks to [urfave/cli](https://github.com/urfave/cli) for providing an easy-to-use CLI framework.
 - Thanks to [Docker](https://www.docker.com/) for making containerization accessible.
+- Thanks to [src-d/hercules](https://github.com/src-d/hercules) for making containerization git stats and export images.
 
 ---
 

@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/urfave/cli/v2"
 )
@@ -53,7 +56,7 @@ func main() {
 			},
 			{
 				Name:   "stat",
-				Usage:  "Generate Docker commands for GitHub repository analytics",
+				Usage:  "Generate hercules git stats from http git url like : 'https://github.com/No-platforms/gitana.git' and export all stats as png images",
 				Action: runStat,
 			},
 			{
@@ -192,19 +195,77 @@ func runStat(c *cli.Context) error {
 	if c.NArg() < 1 {
 		return fmt.Errorf("please provide a GitHub repository URL")
 	}
-	repoURL := c.Args().Get(0)
+	if c.NArg() < 2 {
+		return fmt.Errorf("please provide a port to bind web based report")
+	}
 
-	dockerCommand := fmt.Sprintf(`docker run --rm srcd/hercules hercules --burndown --burndown-files --burndown-people --devs --pb %s | docker run --rm -i -v "$(pwd):/io" srcd/hercules labours -f pb -m all -o /io/%s.png`, repoURL, extractRepoName(repoURL))
+	repoURL := c.Args().Get(0)
+	Port := c.Args().Get(1)
+	//Don't change Order of below arguments
+	modes := []string{
+		"burndown-project",
+		"burndown-file",
+		"burndown-person",
+		"languages",
+		"old-vs-new",
+		"ownership",
+		"run-times",
+		"sentiment",
+	}
+	modStr := strings.Join(modes, " -m ")
+	dockerCommand := fmt.Sprintf(`docker run --rm srcd/hercules hercules --burndown --burndown-files --devs --couples --burndown-people  --pb %s | docker run -p "%s:8000" --rm -i -v "$(pwd):/io" srcd/hercules labours -f pb --background=white -m %s --disable-projector -o /io/%s.png`, repoURL, Port, modStr, extractRepoName(repoURL))
 
 	fmt.Println("Running command:", dockerCommand)
 
-	cmd := exec.Command("bash", "-c", dockerCommand)
-	output, err := cmd.CombinedOutput()
+	// Create a context with a timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "bash", "-c", dockerCommand)
+
+	// Create pipes for stdout and stderr
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return fmt.Errorf("error running command: %v\nOutput: %s", err, output)
+		return fmt.Errorf("failed to create stdout pipe: %v", err)
+	}
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return fmt.Errorf("failed to create stderr pipe: %v", err)
 	}
 
-	fmt.Println(string(output))
+	// Start the command
+	fmt.Println("Starting command execution...")
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start command: %v", err)
+	}
+
+	// Create a channel to signal when we're done reading output
+	done := make(chan bool)
+
+	// Read stdout and stderr concurrently
+	go func() {
+		io.Copy(os.Stdout, stdout)
+		done <- true
+	}()
+	go func() {
+		io.Copy(os.Stderr, stderr)
+		done <- true
+	}()
+
+	// Wait for both stdout and stderr to be fully read
+	<-done
+	<-done
+
+	// Wait for the command to finish
+	fmt.Println("Waiting for command to finish...")
+	if err := cmd.Wait(); err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			return fmt.Errorf("command failed with exit code %d", exitErr.ExitCode())
+		}
+		return fmt.Errorf("failed to run command: %v", err)
+	}
+
+	fmt.Println("Command execution completed successfully.")
 	return nil
 }
 
@@ -219,9 +280,10 @@ func countLines(c *cli.Context) error {
 	return nil
 }
 
+// extract report name for create report directory
 func extractRepoName(url string) string {
-	splitURL := strings.Split(url, "/")
-	return splitURL[len(splitURL)-1]
+	parts := strings.Split(url, "/")
+	return fmt.Sprintf("%s_%s", strings.TrimSuffix(parts[len(parts)-1], ".git"), "gitana_stats")
 }
 
 // Helper function to convert string to int safely
