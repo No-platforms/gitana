@@ -4,6 +4,7 @@
 
 Gitana CLI is a powerful command-line tool designed for generating Dockerized Git analytics and exporting results as PNG images. This tool provides various statistics from Git repositories, making it easier for developers to analyze their code contributions and project history.
 
+You can read more on [MEDIUM](https://medium.com/@yiiman/gitana-revolutionizing-git-repository-analysis-cc0d3a545647)
 ## Features
 
 - **First Commit Info**: Retrieve the date and author of the first commit in the repository.
@@ -136,7 +137,8 @@ This project is licensed under the Apache License - see the [LICENSE](LICENSE) f
 - Thanks to [Docker](https://www.docker.com/) for making containerization accessible.
 - Thanks to [src-d/hercules](https://github.com/src-d/hercules) for making containerization git stats and export images.
 
----
+
 
 For more information or questions, please open an issue or contact me directly!
-```
+
+

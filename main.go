@@ -16,7 +16,7 @@ import (
 func main() {
 	app := &cli.App{
 		Name:  "Gitana CLI",
-		Usage: "Generate dockerized git analytics and export as PNG images",
+		Usage: "Generate git repository analytics",
 		Commands: []*cli.Command{
 			{
 				Name:  "git",
@@ -108,7 +108,7 @@ func getFirstCommit(c *cli.Context) error {
 }
 
 func listContributors(c *cli.Context) error {
-	cmd := exec.Command("git", "shortlog", "-sn", "--no-merges") // Use --no-merges to avoid merge commits
+	cmd := exec.Command("git", "--no-pager", "shortlog", "-sne", "HEAD")
 	output, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("error listing contributors: %v", err)
@@ -116,6 +116,7 @@ func listContributors(c *cli.Context) error {
 
 	contributors := make(map[string]int)
 	lines := strings.Split(string(output), "\n")
+
 	for _, line := range lines {
 		if line == "" {
 			continue
@@ -140,11 +141,12 @@ func listContributors(c *cli.Context) error {
 	for name, count := range contributors {
 		fmt.Printf("%-30s %d\n", name, count)
 	}
+	fmt.Printf("---------------- \n Contributors count are: %d \n", len(lines))
 	return nil
 }
 
 func countMergedBranches(c *cli.Context) error {
-	cmd := exec.Command("git", "branch")
+	cmd := exec.Command("git", "branch", "--list", "--all")
 	output, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("error counting branches: %v", err)
